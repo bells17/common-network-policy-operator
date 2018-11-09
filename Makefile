@@ -16,6 +16,10 @@ manager: generate fmt vet
 run: generate fmt vet
 	go run ./cmd/manager/main.go
 
+# Only run controller
+run-only:
+	go run ./cmd/manager/main.go
+
 # Install CRDs into a cluster
 install: manifests
 	kubectl apply -f config/crds
@@ -40,6 +44,13 @@ vet:
 # Generate code
 generate:
 	go generate ./pkg/... ./cmd/...
+
+# Generate client code
+genclient:
+	./vendor/k8s.io/code-generator/generate-groups.sh all \
+		github.com/bells17/common-network-policy-operator/pkg/client \
+		github.com/bells17/common-network-policy-operator/pkg/apis \
+		commonnetworkpolicies:v1alpha1
 
 # Build the docker image
 docker-build: test

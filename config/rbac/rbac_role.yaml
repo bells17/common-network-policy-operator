@@ -1,0 +1,39 @@
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  creationTimestamp: null
+  name: manager-role
+rules:
+- apiGroups:
+  - corev1
+  resources:
+  - namespace
+  verbs:
+  - get
+  - list
+  - watch
+  - ""
+- apiGroups:
+  - networkingv1
+  resources:
+  - networkpolicy
+  verbs:
+  - get
+  - list
+  - watch
+  - create
+  - update
+  - patch
+  - delete
+- apiGroups:
+  - commonnetworkpolicies.bells17.io
+  resources:
+  - commonnetworkpolicies
+  verbs:
+  - get
+  - list
+  - watch
+  - create
+  - update
+  - patch
+  - delete

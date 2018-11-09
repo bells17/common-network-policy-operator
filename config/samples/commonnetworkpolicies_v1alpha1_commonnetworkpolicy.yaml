@@ -1,0 +1,32 @@
+apiVersion: commonnetworkpolicies.bells17.io/v1alpha1
+kind: CommonNetworkPolicy
+metadata:
+  labels:
+    controller-tools.k8s.io: "1.0"
+  name: sample-networkpolicy
+spec:
+  namePrefix: common
+  excludeNamespaces:
+  - kube-system
+  - common-network-policy-operator-system
+  policySpec:
+    podSelector: {}
+    policyTypes:
+    - Egress
+
+---
+apiVersion: commonnetworkpolicies.bells17.io/v1alpha1
+kind: CommonNetworkPolicy
+metadata:
+  labels:
+    controller-tools.k8s.io: "1.0"
+  name: sample-networkpolicy2
+spec:
+  namePrefix: common
+  excludeNamespaces:
+  - kube-system
+  - common-network-policy-operator-system
+  policySpec:
+    podSelector: {}
+    ingress:
+    - {}
