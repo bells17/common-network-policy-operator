@@ -3,6 +3,7 @@
 package v1alpha1
 
 import (
+	networkingv1 "k8s.io/api/networking/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 )
 
@@ -13,6 +14,9 @@ import (
 type CommonNetworkPolicySpec struct {
 	// INSERT ADDITIONAL SPEC FIELDS - desired state of cluster
 	// Important: Run "make" to regenerate code after modifying this file
+	NamePrefix        string                         `json:"namePrefix,omitempty"`
+	ExcludeNamespaces []string                       `json:"excludeNamespaces,omitempty"`
+	PolicySpec        networkingv1.NetworkPolicySpec `json:"policySpec"`
 }
 
 // CommonNetworkPolicyStatus defines the observed state of CommonNetworkPolicy
