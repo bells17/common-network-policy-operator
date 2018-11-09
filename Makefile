@@ -16,6 +16,10 @@ manager: generate fmt vet
 run: generate fmt vet
 	go run ./cmd/manager/main.go
 
+# Only run controller
+run-only:
+	go run ./cmd/manager/main.go
+
 # Install CRDs into a cluster
 install: manifests
 	kubectl apply -f config/crds
