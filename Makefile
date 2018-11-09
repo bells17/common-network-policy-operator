@@ -1,6 +1,6 @@
 
 # Image URL to use all building/pushing image targets
-IMG ?= controller:latest
+IMG ?= bells17/common-network-policy-controller:latest
 
 all: test manager
 
