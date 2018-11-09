@@ -5,9 +5,18 @@ metadata:
   name: manager-role
 rules:
 - apiGroups:
-  - apps
+  - corev1
   resources:
-  - deployments
+  - namespace
+  verbs:
+  - get
+  - list
+  - watch
+  - ""
+- apiGroups:
+  - networkingv1
+  resources:
+  - networkpolicy
   verbs:
   - get
   - list

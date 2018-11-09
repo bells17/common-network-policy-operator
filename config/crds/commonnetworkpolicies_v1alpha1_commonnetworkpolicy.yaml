@@ -21,6 +21,17 @@ spec:
         metadata:
           type: object
         spec:
+          properties:
+            excludeNamespaces:
+              items:
+                type: string
+              type: array
+            namePrefix:
+              type: string
+            policySpec:
+              type: object
+          required:
+          - policySpec
           type: object
         status:
           type: object
