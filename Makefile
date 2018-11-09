@@ -41,6 +41,13 @@ vet:
 generate:
 	go generate ./pkg/... ./cmd/...
 
+# Generate client code
+genclient:
+	./vendor/k8s.io/code-generator/generate-groups.sh all \
+		github.com/bells17/common-network-policy-operator/pkg/client \
+		github.com/bells17/common-network-policy-operator/pkg/apis \
+		commonnetworkpolicies:v1alpha1
+
 # Build the docker image
 docker-build: test
 	docker build . -t ${IMG}
