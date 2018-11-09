@@ -1,0 +1,3 @@
+version: "1"
+domain: bells17.io
+repo: github.com/bells17/common-network-policy-operator
