@@ -134,8 +134,8 @@ type ReconcileCommonNetworkPolicy struct {
 // TODO(user): Modify this Reconcile function to implement your Controller logic.  The scaffolding writes
 // a Deployment as an example
 // Automatically generate RBAC rules to allow the Controller to read and write Deployments
-// +kubebuilder:rbac:groups=corev1,resources=namespace,verbs=get;list;watch;
-// +kubebuilder:rbac:groups=networkingv1,resources=networkpolicy,verbs=get;list;watch;create;update;patch;delete
+// +kubebuilder:rbac:groups="",resources=namespace,verbs=get;list;watch;
+// +kubebuilder:rbac:groups=networking.k8s.io,resources=networkpolicy,verbs=get;list;watch;create;update;patch;delete
 // +kubebuilder:rbac:groups=commonnetworkpolicies.bells17.io,resources=commonnetworkpolicies,verbs=get;list;watch;create;update;patch;delete
 func (r *ReconcileCommonNetworkPolicy) Reconcile(request reconcile.Request) (reconcile.Result, error) {
 	// Update all Common Network Policies

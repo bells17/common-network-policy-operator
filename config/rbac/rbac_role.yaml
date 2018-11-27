@@ -5,7 +5,7 @@ metadata:
   name: manager-role
 rules:
 - apiGroups:
-  - corev1
+  - ""
   resources:
   - namespace
   verbs:
@@ -14,7 +14,7 @@ rules:
   - watch
   - ""
 - apiGroups:
-  - networkingv1
+  - networking.k8s.io
   resources:
   - networkpolicy
   verbs:
