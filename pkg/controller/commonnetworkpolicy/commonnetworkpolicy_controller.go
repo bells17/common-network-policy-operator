@@ -8,7 +8,6 @@ import (
 	"reflect"
 
 	commonnetworkpoliciesv1alpha1 "github.com/bells17/common-network-policy-operator/pkg/apis/commonnetworkpolicies/v1alpha1"
-	customclientset "github.com/bells17/common-network-policy-operator/pkg/client/clientset/versioned"
 	corev1 "k8s.io/api/core/v1"
 	networkingv1 "k8s.io/api/networking/v1"
 	"k8s.io/apimachinery/pkg/api/errors"
@@ -47,10 +46,9 @@ func newReconciler(mgr manager.Manager) reconcile.Reconciler {
 	}
 
 	return &ReconcileCommonNetworkPolicy{
-		Client:          mgr.GetClient(),
-		scheme:          mgr.GetScheme(),
-		clientSet:       newClientSet(c),
-		customClientSet: newCustomClientSet(c),
+		Client:    mgr.GetClient(),
+		scheme:    mgr.GetScheme(),
+		clientSet: newClientSet(c),
 	}
 }
 
@@ -62,14 +60,6 @@ func newClientSet(c *rest.Config) *kubernetes.Clientset {
 	}
 
 	return clientSet
-}
-
-func newCustomClientSet(c *rest.Config) customclientset.Interface {
-	cli, err := customclientset.NewForConfig(c)
-	if err != nil {
-		panic(err.Error())
-	}
-	return cli
 }
 
 // add adds a new Controller to mgr with r as the reconcile.Reconciler
@@ -124,9 +114,8 @@ var _ reconcile.Reconciler = &ReconcileCommonNetworkPolicy{}
 // ReconcileCommonNetworkPolicy reconciles a CommonNetworkPolicy object
 type ReconcileCommonNetworkPolicy struct {
 	client.Client
-	scheme          *runtime.Scheme
-	clientSet       kubernetes.Interface
-	customClientSet customclientset.Interface
+	scheme    *runtime.Scheme
+	clientSet kubernetes.Interface
 }
 
 // Reconcile reads that state of the cluster for a CommonNetworkPolicy object and makes changes based on the state read
@@ -139,7 +128,8 @@ type ReconcileCommonNetworkPolicy struct {
 // +kubebuilder:rbac:groups=commonnetworkpolicies.bells17.io,resources=commonnetworkpolicies,verbs=get;list;watch;create;update;patch;delete
 func (r *ReconcileCommonNetworkPolicy) Reconcile(request reconcile.Request) (reconcile.Result, error) {
 	// Update all Common Network Policies
-	commonNetworkPolicies, err := r.customClientSet.CommonnetworkpoliciesV1alpha1().CommonNetworkPolicies().List(metav1.ListOptions{})
+	commonNetworkPolicies := &commonnetworkpoliciesv1alpha1.CommonNetworkPolicyList{}
+	err := r.List(context.TODO(), &client.ListOptions{}, commonNetworkPolicies)
 	if err != nil {
 		return reconcile.Result{}, err
 	}
