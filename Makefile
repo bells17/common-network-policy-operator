@@ -38,7 +38,9 @@ delete: manifests
 manifests:
 	go run vendor/sigs.k8s.io/controller-tools/cmd/controller-gen/main.go all
 	rm -fr config/default/rbac
+	rm -fr config/default/crds
 	mv config/rbac config/default/rbac
+	mv config/crds config/default/crds
 
 # Run go fmt against code
 fmt:
@@ -69,3 +71,6 @@ docker-build: test
 # Push the docker image
 docker-push:
 	docker push ${IMG}
+
+gendeploy: manifests
+	kubectl kustomize config/default/ > config/deploy.yaml

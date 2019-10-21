@@ -20,6 +20,7 @@ namePrefix: common-network-policy-operator-
 resources:
 - rbac/rbac_role.yaml
 - rbac/rbac_role_binding.yaml
+- crds/commonnetworkpolicies_v1alpha1_commonnetworkpolicy.yaml
 - manager/manager.yaml
 
 patches:
