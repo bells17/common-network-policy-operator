@@ -13,9 +13,7 @@ Common Policy Operator is auto create common network policy to all namespaces.
 
 ```
 $ kubectl config current-context <TARGET CLUSTER CONTEXT>
-$ git@github.com:bells17/common-network-policy-operator.git
-$ cd common-network-policy-operator
-$ make deploy
+$ kubectl apply -f https://raw.githubusercontent.com/bells17/common-network-policy-operator/1.0.2/config/deploy.yaml
 ```
 
 If install is success, you can check resources as below:
