@@ -124,8 +124,9 @@ type ReconcileCommonNetworkPolicy struct {
 // a Deployment as an example
 // Automatically generate RBAC rules to allow the Controller to read and write Deployments
 // +kubebuilder:rbac:groups="",resources=namespaces,verbs=get;list;watch;
-// +kubebuilder:rbac:groups=networking.k8s.io,resources=networkpolicies,verbs=get;list;watch;create;update;patch;delete
-// +kubebuilder:rbac:groups=commonnetworkpolicies.bells17.io,resources=commonnetworkpolicies,verbs=get;list;watch;create;update;patch;delete
+// +kubebuilder:rbac:groups=networking.k8s.io,resources=networkpolicies,verbs=*
+// +kubebuilder:rbac:groups=commonnetworkpolicies.bells17.io,resources=commonnetworkpolicies,verbs=*
+// +kubebuilder:rbac:groups=commonnetworkpolicies.bells17.io,resources=commonnetworkpolicies/finalizers,verbs=*
 func (r *ReconcileCommonNetworkPolicy) Reconcile(request reconcile.Request) (reconcile.Result, error) {
 	// Update all Common Network Policies
 	commonNetworkPolicies := &commonnetworkpoliciesv1alpha1.CommonNetworkPolicyList{}
@@ -138,7 +139,7 @@ func (r *ReconcileCommonNetworkPolicy) Reconcile(request reconcile.Request) (rec
 
 		// Fetch the CommonNetworkPolicy instance
 		instance := &commonnetworkpoliciesv1alpha1.CommonNetworkPolicy{}
-		err := r.Get(context.TODO(), types.NamespacedName{
+		err = r.Get(context.TODO(), types.NamespacedName{
 			Name:      commonNetworkPolicyItem.ObjectMeta.Name,
 			Namespace: commonNetworkPolicyItem.ObjectMeta.Namespace,
 		}, instance)
@@ -179,11 +180,12 @@ func (r *ReconcileCommonNetworkPolicy) Reconcile(request reconcile.Request) (rec
 				},
 				Spec: commonNetworkPolicyItem.Spec.PolicySpec,
 			}
+
 			err := r.applyNetworkPolicy(instance, networkPolicy)
 			if err != nil {
+				log.Printf("applyNetworkPolicy error - name: %q namespace: %q err %v\n", name, ns, err)
 				return reconcile.Result{}, err
 			}
-
 		}
 	}
 
