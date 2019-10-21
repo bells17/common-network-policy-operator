@@ -18,22 +18,16 @@ rules:
   resources:
   - networkpolicies
   verbs:
-  - get
-  - list
-  - watch
-  - create
-  - update
-  - patch
-  - delete
+  - '*'
 - apiGroups:
   - commonnetworkpolicies.bells17.io
   resources:
   - commonnetworkpolicies
   verbs:
-  - get
-  - list
-  - watch
-  - create
-  - update
-  - patch
-  - delete
+  - '*'
+- apiGroups:
+  - commonnetworkpolicies.bells17.io
+  resources:
+  - commonnetworkpolicies/finalizers
+  verbs:
+  - '*'

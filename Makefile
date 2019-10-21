@@ -1,6 +1,6 @@
 
 # Image URL to use all building/pushing image targets
-VERSION = 1.0.1
+VERSION = 1.0.2
 IMG ?= bells17/common-network-policy-controller:${VERSION}
 
 all: test manager
@@ -28,15 +28,17 @@ install: manifests
 # Deploy controller in the configured Kubernetes cluster in ~/.kube/config
 deploy: manifests
 	kubectl apply -f config/crds
-	kustomize build config/default | kubectl apply -f -
+	kubectl apply -k config/default
 
 delete: manifests
 	kubectl delete -f config/crds
-	kustomize build config/default | kubectl delete -f - || true
+	kubectl delete -k config/default
 
 # Generate manifests e.g. CRD, RBAC etc.
 manifests:
 	go run vendor/sigs.k8s.io/controller-tools/cmd/controller-gen/main.go all
+	rm -fr config/default/rbac
+	mv config/rbac config/default/rbac
 
 # Run go fmt against code
 fmt:
@@ -62,6 +64,7 @@ docker-build: test
 	docker build . -t ${IMG}
 	@echo "updating kustomize image patch file for manager resource"
 	sed -i'' -e 's@image: .*@image: '"${IMG}"'@' ./config/default/manager_image_patch.yaml
+	rm ./config/default/manager_image_patch.yaml-e
 
 # Push the docker image
 docker-push:
