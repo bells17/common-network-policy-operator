@@ -1,71 +1,82 @@
+VERSION = 1.1.0-dev
 
 # Image URL to use all building/pushing image targets
-VERSION = 1.0.2
 IMG ?= bells17/common-network-policy-controller:${VERSION}
+# Produce CRDs that work back to Kubernetes 1.11 (no version conversion)
+CRD_OPTIONS ?= "crd:trivialVersions=true"
 
-all: test manager
+# Get the currently used golang install path (in GOPATH/bin, unless GOBIN is set)
+ifeq (,$(shell go env GOBIN))
+GOBIN=$(shell go env GOPATH)/bin
+else
+GOBIN=$(shell go env GOBIN)
+endif
+
+GOOS ?= linux
+GOARCH ?= amd64
+GO111MODULE = on
+
+
+all: vendor manager
+
+.PHONY: vendor
+vendor:
+	go mod download
+	go mod vendor
+	go mod tidy
 
 # Run tests
 test: generate fmt vet manifests
-	go test ./pkg/... ./cmd/... -coverprofile cover.out
+	go test ./... -coverprofile cover.out
 
 # Build manager binary
 manager: generate fmt vet
-	go build -o bin/manager github.com/bells17/common-network-policy-operator/cmd/manager
+	go build -o bin/manager main.go
 
 # Run against the configured Kubernetes cluster in ~/.kube/config
-run: generate fmt vet
-	go run ./cmd/manager/main.go
-
-# Only run controller
-run-only:
-	go run ./cmd/manager/main.go
+run: generate fmt vet manifests
+	go run ./main.go
 
 # Install CRDs into a cluster
 install: manifests
-	kubectl apply -f config/crds
+	kustomize build config/crd | kubectl apply -f -
 
 # Deploy controller in the configured Kubernetes cluster in ~/.kube/config
 deploy: manifests
-	kubectl apply -f config/crds
-	kubectl apply -k config/default
-
-delete: manifests
-	kubectl delete -f config/crds
-	kubectl delete -k config/default
+	cd config/manager && kustomize edit set image controller=${IMG}
+	kustomize build config/default | kubectl apply -f -
 
 # Generate manifests e.g. CRD, RBAC etc.
-manifests:
-	go run vendor/sigs.k8s.io/controller-tools/cmd/controller-gen/main.go all
-	rm -fr config/default/rbac
-	mv config/rbac config/default/rbac
+manifests: controller-gen
+	$(CONTROLLER_GEN) $(CRD_OPTIONS) rbac:roleName=manager-role webhook paths="./..." output:crd:artifacts:config=config/crd/bases
 
 # Run go fmt against code
 fmt:
-	go fmt ./pkg/... ./cmd/...
+	go fmt ./...
 
 # Run go vet against code
 vet:
-	go vet ./pkg/... ./cmd/...
+	go vet ./...
 
 # Generate code
-generate:
-	go generate ./pkg/... ./cmd/...
+generate: controller-gen
+	$(CONTROLLER_GEN) object:headerFile=./hack/boilerplate.go.txt paths="./..."
 
-# Generate client code
-genclient:
-	./vendor/k8s.io/code-generator/generate-groups.sh all \
-		github.com/bells17/common-network-policy-operator/pkg/client \
-		github.com/bells17/common-network-policy-operator/pkg/apis \
-		commonnetworkpolicies:v1alpha1
-
+# TODO: improve
 # Build the docker image
 docker-build: test
 	docker build . -t ${IMG}
-	@echo "updating kustomize image patch file for manager resource"
-	sed -i'' -e 's@image: .*@image: '"${IMG}"'@' ./config/default/manager_image_patch.yaml
-	rm ./config/default/manager_image_patch.yaml-e
 
 # Push the docker image
 docker-push:
 	docker push ${IMG}
+
+# find or download controller-gen
+# download controller-gen if necessary
+controller-gen:
+ifeq (, $(shell which controller-gen))
+	go get sigs.k8s.io/controller-tools/cmd/controller-gen@v0.2.1
+CONTROLLER_GEN=$(GOBIN)/controller-gen
+else
+CONTROLLER_GEN=$(shell which controller-gen)
+endif

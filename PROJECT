@@ -1,3 +1,7 @@
-version: "1"
+version: "2"
 domain: bells17.io
 repo: github.com/bells17/common-network-policy-operator
+resources:
+- group: commonnetworkpolicy
+  version: v1alpha1
+  kind: CommonNetworkPolicy
